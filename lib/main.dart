@@ -15,7 +15,7 @@ class FitnessTrackerApp extends StatelessWidget {
       // THEME COLORS
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        scaffoldBackgroundColor: Colors.white
+        scaffoldBackgroundColor: Colors.white,
       ),
       home: MyHomePage(),
       debugShowCheckedModeBanner: false,
