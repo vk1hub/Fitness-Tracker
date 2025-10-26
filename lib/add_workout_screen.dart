@@ -12,6 +12,31 @@ class AddWorkoutScreenState extends State<AddWorkoutScreen> {
   TextEditingController repsController = TextEditingController();
   TextEditingController timeController = TextEditingController();
 
+  // List to store all sets
+  List<Map<String, String>> sets = [];
+
+  // Function to add a set
+  void addSet() {
+    setState(() {
+      sets.add({
+        'name': exerciseNameController.text,
+        'weight': weightController.text,
+        'reps': repsController.text,
+      });
+      
+      // Clear the weight and reps fields for next set
+      weightController.clear();
+      repsController.clear();
+    });
+  }
+
+  // Function to remove a set
+  void removeSet(int index) {
+    setState(() {
+      sets.removeAt(index);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,9 +96,7 @@ class AddWorkoutScreenState extends State<AddWorkoutScreen> {
             
             // Add Set button
             GestureDetector(
-              onTap: () {
-                //
-              },
+              onTap: addSet,
               child: Container(
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(vertical: 15),
@@ -88,8 +111,49 @@ class AddWorkoutScreenState extends State<AddWorkoutScreen> {
                 ),
               ),
             ),
+            SizedBox(height: 20),
             
-            Spacer(),
+            // Display added sets
+            Expanded(
+              child: ListView.builder(
+                itemCount: sets.length,
+                itemBuilder: (context, index) {
+                  return Container(
+                    margin: EdgeInsets.only(bottom: 10),
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.black),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${sets[index]['name']}',
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                'Set ${index + 1}: ${sets[index]['weight']} lbs x ${sets[index]['reps']} reps',
+                                style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.delete),
+                          onPressed: () => removeSet(index),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
             
             // Time field 
             TextField(
