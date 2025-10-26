@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'preset_routines.dart';
+import 'add_exercise_screen.dart';
 
 class WorkoutScreen extends StatefulWidget {
   @override
@@ -28,10 +29,14 @@ class WorkoutScreenState extends State<WorkoutScreen> {
       // ADD WORKOT BUTTON
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          print('add new workout');
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddExerciseScreen()),
+          );
+          ;
         },
         child: Icon(Icons.add),
-      )
+      ),
     );
   }
 }
