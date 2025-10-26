@@ -1,15 +1,46 @@
 import 'package:flutter/material.dart';
+import 'workout_model.dart';
 
 class AddCustomScreen extends StatefulWidget {
+  final Function(WorkoutModel)? onAddWorkout;
+
+  AddCustomScreen({this.onAddWorkout});
+
   @override
   AddCustomScreenState createState() => AddCustomScreenState();
 }
 
 class AddCustomScreenState extends State<AddCustomScreen> {
-
   // manage input fields
   TextEditingController customController = TextEditingController();
   TextEditingController timeController = TextEditingController();
+
+  // save custom exercise
+  void saveCustomExercise() {
+    if (customController.text.isEmpty || timeController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please fill in description and time')),
+      );
+      return;
+    }
+
+    String details = 'Time: ${timeController.text} min';
+
+    WorkoutModel workout = WorkoutModel(
+      type: 'Custom',
+      name: customController.text,
+      details: details,
+      date: DateTime.now(),
+    );
+
+    if (widget.onAddWorkout != null) {
+      widget.onAddWorkout!(workout);
+      Navigator.pop(context);
+      Navigator.pop(context);
+    } else {
+      Navigator.pop(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,9 +105,7 @@ class AddCustomScreenState extends State<AddCustomScreen> {
                 // add exercise
                 Expanded(
                   child: GestureDetector(
-                    onTap: () {
-                      // 
-                    },
+                    onTap: saveCustomExercise,
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: 15),
                       decoration: BoxDecoration(

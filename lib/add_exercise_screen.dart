@@ -55,7 +55,7 @@ class AddExerciseScreen extends StatelessWidget {
             buildExerciseButton(context, 'Custom Exercise', Icons.control_point, () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AddCustomScreen()),
+                  MaterialPageRoute(builder: (context) => AddCustomScreen(onAddWorkout: onAddWorkout)),
                 );
               },
             ),
