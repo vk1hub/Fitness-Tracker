@@ -1,20 +1,48 @@
 import 'package:flutter/material.dart';
+import 'workout_model.dart';
 
 class AddRunningBikingScreen extends StatefulWidget {
-
   // Constructor to accept type parameter (running or biking)
   final String type;
-  AddRunningBikingScreen({required this.type});
+  final Function(WorkoutModel)? onAddWorkout;
+
+  AddRunningBikingScreen({required this.type, this.onAddWorkout});
 
   @override
   AddRunningBikingState createState() => AddRunningBikingState();
 }
 
 class AddRunningBikingState extends State<AddRunningBikingScreen> {
-
   // manage input fields
   TextEditingController timeController = TextEditingController();
   TextEditingController distanceController = TextEditingController();
+
+  // Function to save activity
+  void saveActivity() {
+    if (timeController.text.isEmpty || distanceController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please fill in time and distance')),
+      );
+      return;
+    }
+
+    String details = 'Time: ${timeController.text} min\nDistance: ${distanceController.text} miles';
+
+    WorkoutModel workout = WorkoutModel(
+      type: widget.type,
+      name: widget.type,
+      details: details,
+      date: DateTime.now(),
+    );
+
+    if (widget.onAddWorkout != null) {
+      widget.onAddWorkout!(workout);
+      Navigator.pop(context);
+      Navigator.pop(context);
+    } else {
+      Navigator.pop(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,9 +109,7 @@ class AddRunningBikingState extends State<AddRunningBikingScreen> {
                 // Add Running/Biking button
                 Expanded(
                   child: GestureDetector(
-                    onTap: () {
-                      //
-                    },
+                    onTap: saveActivity,
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: 15),
                       decoration: BoxDecoration(

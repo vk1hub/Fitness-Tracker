@@ -37,7 +37,7 @@ class AddExerciseScreen extends StatelessWidget {
             buildExerciseButton(context, 'Running', Icons.directions_run, () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AddRunningBikingScreen(type: 'Running')),
+                MaterialPageRoute(builder: (context) => AddRunningBikingScreen(type: 'Running', onAddWorkout: onAddWorkout)),
               );
             }),
             SizedBox(height: 15),
@@ -46,7 +46,7 @@ class AddExerciseScreen extends StatelessWidget {
             buildExerciseButton(context, 'Biking', Icons.directions_bike, () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AddRunningBikingScreen(type: 'Biking')),
+                MaterialPageRoute(builder: (context) => AddRunningBikingScreen(type: 'Biking', onAddWorkout: onAddWorkout)),
               );
             }),
             SizedBox(height: 15),
