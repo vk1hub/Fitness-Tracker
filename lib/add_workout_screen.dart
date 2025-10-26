@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'workout_model.dart';
 
 class AddWorkoutScreen extends StatefulWidget {
+  final Function(WorkoutModel)? onAddWorkout;
+
+  AddWorkoutScreen({this.onAddWorkout});
+
   @override
   AddWorkoutScreenState createState() => AddWorkoutScreenState();
 }
@@ -50,6 +54,73 @@ class AddWorkoutScreenState extends State<AddWorkoutScreen> {
     setState(() {
       sets.removeAt(index);
     });
+  }
+
+  // function to save a workout
+  void saveWorkout() {
+    if (sets.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please add at least one set')),
+      );
+      return;
+    }
+
+    // find the different exercise names
+    List<String> uniqueExercises = [];
+    for (int i = 0; i < sets.length; i++) {
+      String exerciseName = sets[i]['name']!;
+      if (!uniqueExercises.contains(exerciseName)) {
+        uniqueExercises.add(exerciseName);
+      }
+    }
+
+    // create workout name by joining the workout names
+    String workoutName = '';
+    for (int i = 0; i < uniqueExercises.length; i++) {
+      workoutName += uniqueExercises[i];
+      if (i < uniqueExercises.length - 1) {
+        workoutName += ', ';
+      }
+    }
+
+    // Build the details string with grouped exercises
+    String details = '';
+    for (int i = 0; i < uniqueExercises.length; i++) {
+      String currentExercise = uniqueExercises[i];
+      details += '$currentExercise\n';
+      
+      // Add all sets for this exercise
+      int setNumber = 1;
+      for (int j = 0; j < sets.length; j++) {
+        if (sets[j]['name'] == currentExercise) {
+          details += '  Set $setNumber: ${sets[j]['weight']} lbs x ${sets[j]['reps']} reps\n';
+          setNumber++;
+        }
+      }
+      details += '\n';
+    }
+
+    // Add time if provided
+    if (timeController.text.isNotEmpty) {
+      details += 'Total Time: ${timeController.text} minutes';
+    }
+
+    // Create workout model
+    WorkoutModel workout = WorkoutModel(
+      type: 'Weight Training',
+      name: workoutName,
+      details: details.trim(),
+      date: DateTime.now(),
+    );
+
+    // Call the callback to add workout if it exists
+    if (widget.onAddWorkout != null) {
+      widget.onAddWorkout!(workout);
+      Navigator.pop(context);
+      Navigator.pop(context);
+    } else {
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -157,7 +228,7 @@ class AddWorkoutScreenState extends State<AddWorkoutScreen> {
                       padding: EdgeInsets.symmetric(vertical: 15),
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.black),
-                      ),
+                      ), 
                       child: Center(
                         child: Text(
                           'Discard',
@@ -171,9 +242,7 @@ class AddWorkoutScreenState extends State<AddWorkoutScreen> {
                 // Add Workout button
                 Expanded(
                   child: GestureDetector(
-                    onTap: () {
-                      //
-                    },
+                    onTap: saveWorkout,
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: 15),
                       decoration: BoxDecoration(

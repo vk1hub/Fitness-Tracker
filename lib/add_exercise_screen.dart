@@ -2,8 +2,13 @@ import 'package:fitness_tracker_application/add_custom_exercise.dart';
 import 'package:fitness_tracker_application/add_workout_screen.dart';
 import 'package:fitness_tracker_application/running_biking_screen.dart';
 import 'package:flutter/material.dart';
+import 'workout_model.dart';
 
 class AddExerciseScreen extends StatelessWidget {
+  final Function(WorkoutModel) onAddWorkout;
+
+  AddExerciseScreen({required this.onAddWorkout});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +28,7 @@ class AddExerciseScreen extends StatelessWidget {
             buildExerciseButton(context, 'Workout', Icons.fitness_center, () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AddWorkoutScreen()),
+                MaterialPageRoute(builder: (context) => AddWorkoutScreen(onAddWorkout: onAddWorkout)),
               );
             }),
             SizedBox(height: 15),
@@ -48,11 +53,12 @@ class AddExerciseScreen extends StatelessWidget {
 
             // Custom Exercise
             buildExerciseButton(context, 'Custom Exercise', Icons.control_point, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AddCustomScreen()),
-              );
-            }),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AddCustomScreen()),
+                );
+              },
+            ),
           ],
         ),
       ),
