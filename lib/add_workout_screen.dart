@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'workout_model.dart';
 
 class AddWorkoutScreen extends StatefulWidget {
   @override
@@ -17,6 +18,20 @@ class AddWorkoutScreenState extends State<AddWorkoutScreen> {
 
   // Function to add a set
   void addSet() {
+    if (exerciseNameController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Enter exercise name')),
+      );
+      return;
+    }
+    
+    if (weightController.text.isEmpty || repsController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Weight and reps cannot be empty')),
+      );
+      return;
+    }
+
     setState(() {
       sets.add({
         'name': exerciseNameController.text,
@@ -115,44 +130,7 @@ class AddWorkoutScreenState extends State<AddWorkoutScreen> {
             
             // Display added sets
             Expanded(
-              child: ListView.builder(
-                itemCount: sets.length,
-                itemBuilder: (context, index) {
-                  return Container(
-                    margin: EdgeInsets.only(bottom: 10),
-                    padding: EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.black),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${sets[index]['name']}',
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                'Set ${index + 1}: ${sets[index]['weight']} lbs x ${sets[index]['reps']} reps',
-                                style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.delete),
-                          onPressed: () => removeSet(index),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+              child: buildGroupedSetsList(),
             ),
             
             // Time field 
@@ -215,6 +193,99 @@ class AddWorkoutScreenState extends State<AddWorkoutScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  // build grouped sets list
+  Widget buildGroupedSetsList() {
+    if (sets.isEmpty) {
+      return Center(
+        child: Text(
+          'No sets added yet',
+          style: TextStyle(fontSize: 16),
+        ),
+      );
+    }
+
+    // checking if exercise names are unique
+    List<String> uniqueExercises = [];
+    for (int i = 0; i < sets.length; i++) {
+      String exerciseName = sets[i]['name']!;
+      // add exercise if its not in the list for grouped display
+      if (!uniqueExercises.contains(exerciseName)) {
+        uniqueExercises.add(exerciseName);
+      }
+    }
+
+    List<Widget> exerciseCards = [];
+
+    for (int i = 0; i < uniqueExercises.length; i++) {
+      String currentExercise = uniqueExercises[i];
+      
+      // getting all sets
+      List<Widget> setWidgets = [];
+      int setNumber = 1;
+      
+      // loop through sets to find matching exercise names
+      for (int j = 0; j < sets.length; j++) {
+        if (sets[j]['name'] == currentExercise) {
+          setWidgets.add(
+            Padding(
+              padding: EdgeInsets.symmetric(),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Set $setNumber: ${sets[j]['weight']} lbs x ${sets[j]['reps']} reps',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.delete, size: 20),
+                    onPressed: () => removeSet(j),
+                    padding: EdgeInsets.zero,
+                    constraints: BoxConstraints(),
+                  ),
+                ],
+              ),
+            ),
+          );
+          setNumber++;
+        }
+      }
+
+      // Create the card for this exercise
+      exerciseCards.add(
+        Container(
+          margin: EdgeInsets.only(bottom: 16),
+          padding: EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // NAME OF EXERCISE
+              Text(
+                currentExercise,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 8),
+              Column(children: setWidgets),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // return list of exercise cards
+    return ListView(
+      children: exerciseCards,
     );
   }
 }
