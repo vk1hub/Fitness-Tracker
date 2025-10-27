@@ -12,6 +12,15 @@ class CalorieScreenState extends State<CalorieScreen> {
 
   List<Map<String, dynamic>> foods = [];
 
+  // calculate total calories
+  int getTotalCalories() {
+    int total = 0;
+    for (int i = 0; i < foods.length; i++) {
+      total += foods[i]['calories'] as int;
+    }
+    return total;
+  }
+
   // add food function
   void addFood() {
     if (foodController.text.isEmpty || caloriesController.text.isEmpty) {
@@ -41,9 +50,22 @@ class CalorieScreenState extends State<CalorieScreen> {
 
   @override
   Widget build(BuildContext context) {
+    int totalCalories = getTotalCalories();
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Calorie Tracker'),
+        actions: [
+          Padding(
+            padding: EdgeInsets.all(16),
+            child: Center(
+              child: Text(
+                '$totalCalories cal',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
