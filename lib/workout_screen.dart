@@ -7,8 +7,9 @@ import 'workout_model.dart';
 class WorkoutScreen extends StatefulWidget {
   final List<WorkoutModel> workouts;
   final Function(WorkoutModel) onAddWorkout;
+  final Function onDeleteWorkout;
 
-  WorkoutScreen({required this.workouts, required this.onAddWorkout});
+  WorkoutScreen({required this.workouts, required this.onAddWorkout, required this.onDeleteWorkout });
 
   @override
   WorkoutScreenState createState() => WorkoutScreenState();
@@ -37,6 +38,7 @@ class WorkoutScreenState extends State<WorkoutScreen> {
     setState(() {
       widget.workouts.remove(workout);
     });
+    widget.onDeleteWorkout();
   }
 
   @override

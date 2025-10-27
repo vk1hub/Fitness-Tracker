@@ -3,6 +3,7 @@ import 'calorie_screen.dart';
 import 'chart_screen.dart';
 import 'workout_screen.dart';
 import 'workout_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -16,20 +17,80 @@ class MyHomePageState extends State<MyHomePage> {
   // List to store all workouts
   List<WorkoutModel> workouts = [];
 
+  @override
+  void initState() {
+    super.initState();
+    loadWorkouts();
+  }
+
+  void loadWorkouts() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    
+    // get saved lists
+    List<String>? types = prefs.getStringList('workout_types');
+    List<String>? names = prefs.getStringList('workout_names');
+    List<String>? details = prefs.getStringList('workout_details');
+    List<String>? dates = prefs.getStringList('workout_dates');
+    
+    // to stop crashing from no info
+    if (types == null || names == null || details == null || dates == null) {
+      return;
+    }
+    
+    // Build workouts from the lists
+    List<WorkoutModel> loadedWorkouts = [];
+    for (int i = 0; i < types.length; i++) {
+      WorkoutModel workout = WorkoutModel(
+        type: types[i],
+        name: names[i],
+        details: details[i],
+        date: DateTime.parse(dates[i]),
+      );
+      loadedWorkouts.add(workout);
+    }
+    
+    setState(() {
+      workouts = loadedWorkouts;
+    });
+  }
+
+  void saveWorkouts() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    
+    List<String> types = [];
+    List<String> names = [];
+    List<String> details = [];
+    List<String> dates = [];
+    
+    // Fill the lists with data from workouts
+    for (int i = 0; i < workouts.length; i++) {
+      types.add(workouts[i].type);
+      names.add(workouts[i].name);
+      details.add(workouts[i].details);
+      dates.add(workouts[i].date.toString());
+    }
+    
+    await prefs.setStringList('workout_types', types);
+    await prefs.setStringList('workout_names', names);
+    await prefs.setStringList('workout_details', details);
+    await prefs.setStringList('workout_dates', dates);
+  }
+
   // Function to add a workout
   void addWorkout(WorkoutModel workout) {
     setState(() {
       workouts.add(workout);
     });
+    saveWorkouts();
   }
 
   @override
   Widget build(BuildContext context) {
     // list of screens - pass workouts to all screens that need it
     final List<Widget> screens = [
-      WorkoutScreen(workouts: workouts, onAddWorkout: addWorkout),
+      WorkoutScreen(workouts: workouts, onAddWorkout: addWorkout, onDeleteWorkout: saveWorkouts),
       CalorieScreen(),
-      ChartScreen(workouts: workouts), // Pass workouts here
+      ChartScreen(workouts: workouts),
     ];
 
     return Scaffold(
