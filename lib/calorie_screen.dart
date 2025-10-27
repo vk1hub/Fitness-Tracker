@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CalorieScreen extends StatefulWidget {
   @override
@@ -16,6 +17,55 @@ class CalorieScreenState extends State<CalorieScreen> {
   // calender state
   DateTime selectedDate = DateTime.now();
   DateTime focusedDate = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    loadFoods();
+  }
+
+  void loadFoods() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    
+    List<String>? foodNames = prefs.getStringList('food_names');
+    List<String>? foodCalories = prefs.getStringList('food_calories');
+    List<String>? foodDates = prefs.getStringList('food_dates');
+    
+    if (foodNames == null || foodCalories == null || foodDates == null) {
+      return;
+    }
+    
+    // creates the foods list
+    List<Map<String, dynamic>> loadedFoods = [];
+    for (int i = 0; i < foodNames.length; i++) {
+      loadedFoods.add({
+        'name': foodNames[i],
+        'calories': int.parse(foodCalories[i]),
+        'date': DateTime.parse(foodDates[i]),
+      });
+    }
+    
+    setState(() {
+      foods = loadedFoods;
+    });
+  }
+
+  void saveFoods() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    
+    List<String> foodNames = [];
+    List<String> foodCalories = [];
+    List<String> foodDates = [];
+    
+    for (int i = 0; i < foods.length; i++) {
+      foodNames.add(foods[i]['name']);
+      foodCalories.add(foods[i]['calories'].toString());
+      foodDates.add((foods[i]['date'] as DateTime).toString());
+    }
+    await prefs.setStringList('food_names', foodNames);
+    await prefs.setStringList('food_calories', foodCalories);
+    await prefs.setStringList('food_dates', foodDates);
+  }
 
   // calculate total calories for selected date
   int getTotalCalories() {
@@ -64,6 +114,7 @@ class CalorieScreenState extends State<CalorieScreen> {
       foodController.clear();
       caloriesController.clear();
     });
+    saveFoods();
   }
 
   // remove food function
@@ -72,6 +123,7 @@ class CalorieScreenState extends State<CalorieScreen> {
       Map<String, dynamic> foodToRemove = getFoodsForSelectedDate()[index];
       foods.remove(foodToRemove);
     });
+    saveFoods();
   }
 
   @override
