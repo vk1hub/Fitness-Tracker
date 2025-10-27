@@ -25,11 +25,11 @@ class MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // list of screens - pass workouts and addWorkout function to WorkoutScreen
+    // list of screens - pass workouts to all screens that need it
     final List<Widget> screens = [
       WorkoutScreen(workouts: workouts, onAddWorkout: addWorkout),
       CalorieScreen(),
-      ChartScreen(),
+      ChartScreen(workouts: workouts), // Pass workouts here
     ];
 
     return Scaffold(
