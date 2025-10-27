@@ -17,6 +17,8 @@ class MyHomePageState extends State<MyHomePage> {
   // List to store all workouts
   List<WorkoutModel> workouts = [];
 
+  PageController pageController = PageController();
+
   @override
   void initState() {
     super.initState();
@@ -94,7 +96,15 @@ class MyHomePageState extends State<MyHomePage> {
     ];
 
     return Scaffold(
-      body: screens[currentPage],
+      body: PageView(
+        controller: pageController,
+        onPageChanged: (index) {
+          setState(() {
+            currentPage = index;
+          });
+        },
+        children: screens,
+      ),
 
       // Bottom navigation bar for switching between screens
       bottomNavigationBar: BottomNavigationBar(
@@ -103,6 +113,7 @@ class MyHomePageState extends State<MyHomePage> {
           setState(() {
             currentPage = index;
           });
+          pageController.animateToPage(index, duration: Duration(milliseconds: 300), curve: Curves.fastEaseInToSlowEaseOut,);
         },
         // Bottom navigation tabs
         items: const[
