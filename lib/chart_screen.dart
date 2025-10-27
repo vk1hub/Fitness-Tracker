@@ -146,56 +146,95 @@ class ChartScreenState extends State<ChartScreen> {
           ),
           
           // Chart area
-          Expanded(
+          Expanded( 
             child: Padding(
               padding: EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: List.generate(7, (index) {
-                  double time = workoutTimePerDay(weekDays[index]);
-                  
-                  // get the max height of the bar (max 90 minutes shown)
-                  double maxHeight = 400;
-                  double barHeight = (time / 90) * maxHeight;
-                  if (barHeight > maxHeight) barHeight = maxHeight;
-                  
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      // add time label for the bar
-                      if (time > 0)
-                        Text(
-                          '${time.toInt()}',
-                          style: TextStyle(fontSize: 12),
-                        ),
-                      if (time > 0) SizedBox(height: 4),
-                      
-                      // the bar
-                      Container(
-                        width: 30,
-                        height: barHeight,
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.only(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        // Dashed line at 45 minutes
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: (45 / 90) * 400 + 53,
+                          child: CustomPaint(
+                            size: Size(double.infinity, 1),
+                            painter: DashedLinePainter(),
                           ),
                         ),
+                        
+                        // Bars
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: List.generate(7, (index) {
+                            double time = workoutTimePerDay(weekDays[index]);
+                            
+                            // get the max height of the bar (max 90 minutes shown)
+                            double maxHeight = 400;
+                            double barHeight = (time / 90) * maxHeight;
+                            if (barHeight > maxHeight) barHeight = maxHeight;
+                            
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                // add time label for the bar
+                                if (time > 0)
+                                  Text(
+                                    '${time.toInt()}',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                if (time > 0) SizedBox(height: 4),
+                                
+                                // the bar
+                                Container(
+                                  width: 30,
+                                  height: barHeight,
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue,
+                                    borderRadius: BorderRadius.only(
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                
+                                // Day name
+                                Text(
+                                  dayNames[index],
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  '${weekDays[index].month}/${weekDays[index].day}',
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                              ],
+                            );
+                          }),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  // Goal line 
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CustomPaint(
+                        size: Size(20, 3),
+                        painter: DashedLinePainter(),
                       ),
-                      SizedBox(height: 8),
-                      
-                      // Day name
+                      SizedBox(width: 8),
                       Text(
-                        dayNames[index],
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        '${weekDays[index].month}/${weekDays[index].day}',
-                        style: TextStyle(fontSize: 14),
+                        '45 min goal',
+                        style: TextStyle(fontSize: 12, color: Colors.red),
                       ),
                     ],
-                  );
-                }),
+                  ),
+                ],
               ),
             ),
           ),
@@ -203,4 +242,29 @@ class ChartScreenState extends State<ChartScreen> {
       ),
     );
   }
+}
+
+class DashedLinePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.red
+      ..strokeWidth = 2;
+
+    double dashWidth = 5;
+    double dashSpace = 5;
+    double x = 0;
+
+    while (x < size.width) {
+      canvas.drawLine(
+        Offset(x, 0),
+        Offset(x + dashWidth, 0),
+        paint,
+      );
+      x += dashWidth + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
