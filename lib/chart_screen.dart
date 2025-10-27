@@ -10,13 +10,35 @@ class ChartScreen extends StatefulWidget {
   ChartScreenState createState() => ChartScreenState();
 }
 
-class ChartScreenState extends State<ChartScreen> {
+class ChartScreenState extends State<ChartScreen> with SingleTickerProviderStateMixin {
   DateTime currentWeekStart = DateTime.now();
+  
+  late AnimationController animationController;
+  late Animation<double> animation;
 
   @override
   void initState() {
     super.initState();
     currentWeekStart = getStartOfWeek(DateTime.now());
+
+    animationController = AnimationController(
+      duration: Duration(milliseconds: 1000),
+      vsync: this,
+    );
+    
+    animation = CurvedAnimation(
+      parent: animationController,
+      curve: Curves.easeOut,
+    );
+    
+    // animation start
+    animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
   }
 
   // Get the start of the week (Sunday)
@@ -71,12 +93,16 @@ class ChartScreenState extends State<ChartScreen> {
     setState(() {
       currentWeekStart = currentWeekStart.subtract(Duration(days: 7));
     });
+    animationController.reset();
+    animationController.forward();
   }
 
   void nextWeek() {
     setState(() {
       currentWeekStart = currentWeekStart.add(Duration(days: 7));
     });
+    animationController.reset();
+    animationController.forward();
   }
 
   @override
@@ -152,73 +178,90 @@ class ChartScreenState extends State<ChartScreen> {
               child: Column(
                 children: [
                   Expanded(
-                    child: Stack(
-                      children: [
-                        // Dashed line at 45 minutes
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          bottom: (45 / 90) * 400 + 53,
-                          child: CustomPaint(
-                            size: Size(double.infinity, 1),
-                            painter: DashedLinePainter(),
-                          ),
-                        ),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        // max height for bar
+                        double availableHeight = constraints.maxHeight - 100;
                         
-                        // Bars
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: List.generate(7, (index) {
-                            double time = workoutTimePerDay(weekDays[index]);
-                            
-                            // get the max height of the bar (max 90 minutes shown)
-                            double maxHeight = 400;
-                            double barHeight = (time / 90) * maxHeight;
-                            if (barHeight > maxHeight) barHeight = maxHeight;
-                            
-                            return Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
+                        return AnimatedBuilder(
+                          animation: animation,
+                          builder: (context, child) {
+                            return Stack(
                               children: [
-                                // add time label for the bar
-                                if (time > 0)
-                                  Text(
-                                    '${time.toInt()}',
-                                    style: TextStyle(fontSize: 12),
+                                // Dashed line at 45 minutes
+                                Positioned(
+                                  left: 0,
+                                  right: 0,
+                                  bottom: (45 / 90) * availableHeight + 50,
+                                  child: CustomPaint(
+                                    size: Size(double.infinity, 1),
+                                    painter: DashedLinePainter(),
                                   ),
-                                if (time > 0) SizedBox(height: 4),
+                                ),
                                 
-                                // the bar
-                                Container(
-                                  width: 30,
-                                  height: barHeight,
-                                  decoration: BoxDecoration(
-                                    color: Colors.blue,
-                                    borderRadius: BorderRadius.only(
+                                // The bars
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: List.generate(7, (index) {
+                                double time = workoutTimePerDay(weekDays[index]);
+                                
+                                // get max bar height
+                                double barHeight = (time / 90) * availableHeight;
+                                if (barHeight > availableHeight) barHeight = availableHeight;
+                                
+                                // Animate the height
+                                double animatedHeight = barHeight * animation.value;
+                                
+                                return Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    SizedBox(height: 20),
+                                    
+                                    // Time label
+                                    if (time > 0)
+                                      Opacity(
+                                        opacity: animation.value,
+                                        child: Text(
+                                          '${time.toInt()}',
+                                          style: TextStyle(fontSize: 12),
+                                        ),
+                                      ),
+                                    if (time > 0) SizedBox(height: 4),
+                                    
+                                    // The bar
+                                    Container(
+                                      width: 30,
+                                      height: animatedHeight,
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue,
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                                
-                                // Day name
-                                Text(
-                                  dayNames[index],
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  '${weekDays[index].month}/${weekDays[index].day}',
-                                  style: TextStyle(fontSize: 14),
-                                ),
+                                    SizedBox(height: 8),
+                                    
+                                    // Day name
+                                    Text(
+                                      dayNames[index],
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      '${weekDays[index].month}/${weekDays[index].day}',
+                                      style: TextStyle(fontSize: 14),
+                                    ),
+                                  ],
+                                );
+                              }),
+                            ),
                               ],
                             );
-                          }),
-                        ),
-                      ],
+                          },
+                        );
+                      },
                     ),
                   ),
                   
-                  // Goal line 
+                  // Goal line legend
                   SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
