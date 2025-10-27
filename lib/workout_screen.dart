@@ -9,7 +9,11 @@ class WorkoutScreen extends StatefulWidget {
   final Function(WorkoutModel) onAddWorkout;
   final Function onDeleteWorkout;
 
-  WorkoutScreen({required this.workouts, required this.onAddWorkout, required this.onDeleteWorkout });
+  WorkoutScreen({
+    required this.workouts, 
+    required this.onAddWorkout,
+    required this.onDeleteWorkout,
+  });
 
   @override
   WorkoutScreenState createState() => WorkoutScreenState();
@@ -55,7 +59,12 @@ class WorkoutScreenState extends State<WorkoutScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => PresetRoutinesScreen()),
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) => PresetRoutinesScreen(),
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                ),
               );
             },
           ),
