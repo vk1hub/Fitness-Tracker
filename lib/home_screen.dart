@@ -4,6 +4,7 @@ import 'chart_screen.dart';
 import 'workout_screen.dart';
 import 'workout_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'notification_helper.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -22,7 +23,14 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    NotificationHelper.setup();
     loadWorkouts();
+  }
+
+  @override
+  void dispose() {
+    pageController.dispose();
+    super.dispose();
   }
 
   void loadWorkouts() async {
@@ -84,6 +92,7 @@ class MyHomePageState extends State<MyHomePage> {
       workouts.add(workout);
     });
     saveWorkouts();
+    NotificationHelper.checkWorkout(workouts);
   }
 
   @override
