@@ -5,8 +5,9 @@ class AddRunningBikingScreen extends StatefulWidget {
   // Constructor to accept type parameter (running or biking)
   final String type;
   final Function(WorkoutModel)? onAddWorkout;
+  final DateTime selectedDate;
 
-  AddRunningBikingScreen({required this.type, this.onAddWorkout});
+  AddRunningBikingScreen({required this.type, this.onAddWorkout, required this.selectedDate});
 
   @override
   AddRunningBikingState createState() => AddRunningBikingState();
@@ -32,7 +33,7 @@ class AddRunningBikingState extends State<AddRunningBikingScreen> {
       type: widget.type,
       name: widget.type,
       details: details,
-      date: DateTime.now(),
+      date: widget.selectedDate,
     );
 
     if (widget.onAddWorkout != null) {

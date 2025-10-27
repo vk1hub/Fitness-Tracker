@@ -3,8 +3,9 @@ import 'workout_model.dart';
 
 class AddWorkoutScreen extends StatefulWidget {
   final Function(WorkoutModel)? onAddWorkout;
+  final DateTime selectedDate;
 
-  AddWorkoutScreen({this.onAddWorkout});
+  AddWorkoutScreen({this.onAddWorkout, required this.selectedDate});
 
   @override
   AddWorkoutScreenState createState() => AddWorkoutScreenState();
@@ -110,7 +111,7 @@ class AddWorkoutScreenState extends State<AddWorkoutScreen> {
       type: 'Weight Training',
       name: workoutName,
       details: details.trim(),
-      date: DateTime.now(),
+      date: widget.selectedDate,
     );
 
     // Call the callback to add workout if it exists

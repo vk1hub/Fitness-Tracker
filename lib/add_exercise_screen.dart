@@ -6,8 +6,9 @@ import 'workout_model.dart';
 
 class AddExerciseScreen extends StatelessWidget {
   final Function(WorkoutModel) onAddWorkout;
+  final DateTime selectedDate;
 
-  AddExerciseScreen({required this.onAddWorkout});
+  AddExerciseScreen({required this.onAddWorkout, required this.selectedDate});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +29,7 @@ class AddExerciseScreen extends StatelessWidget {
             buildExerciseButton(context, 'Workout', Icons.fitness_center, () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AddWorkoutScreen(onAddWorkout: onAddWorkout)),
+                MaterialPageRoute(builder: (context) => AddWorkoutScreen(onAddWorkout: onAddWorkout, selectedDate: selectedDate)),
               );
             }),
             SizedBox(height: 15),
@@ -37,7 +38,7 @@ class AddExerciseScreen extends StatelessWidget {
             buildExerciseButton(context, 'Running', Icons.directions_run, () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AddRunningBikingScreen(type: 'Running', onAddWorkout: onAddWorkout)),
+                MaterialPageRoute(builder: (context) => AddRunningBikingScreen(type: 'Running', onAddWorkout: onAddWorkout, selectedDate: selectedDate)),
               );
             }),
             SizedBox(height: 15),
@@ -46,7 +47,7 @@ class AddExerciseScreen extends StatelessWidget {
             buildExerciseButton(context, 'Biking', Icons.directions_bike, () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AddRunningBikingScreen(type: 'Biking', onAddWorkout: onAddWorkout)),
+                MaterialPageRoute(builder: (context) => AddRunningBikingScreen(type: 'Biking', onAddWorkout: onAddWorkout, selectedDate: selectedDate)),
               );
             }),
             SizedBox(height: 15),
@@ -55,7 +56,7 @@ class AddExerciseScreen extends StatelessWidget {
             buildExerciseButton(context, 'Custom Exercise', Icons.control_point, () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AddCustomScreen(onAddWorkout: onAddWorkout)),
+                  MaterialPageRoute(builder: (context) => AddCustomScreen(onAddWorkout: onAddWorkout, selectedDate: selectedDate)),
                 );
               },
             ),

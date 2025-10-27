@@ -3,8 +3,9 @@ import 'workout_model.dart';
 
 class AddCustomScreen extends StatefulWidget {
   final Function(WorkoutModel)? onAddWorkout;
+  final DateTime selectedDate;
 
-  AddCustomScreen({this.onAddWorkout});
+  AddCustomScreen({this.onAddWorkout, required this.selectedDate});
 
   @override
   AddCustomScreenState createState() => AddCustomScreenState();
@@ -30,7 +31,7 @@ class AddCustomScreenState extends State<AddCustomScreen> {
       type: 'Custom',
       name: customController.text,
       details: details,
-      date: DateTime.now(),
+      date: widget.selectedDate,
     );
 
     if (widget.onAddWorkout != null) {
