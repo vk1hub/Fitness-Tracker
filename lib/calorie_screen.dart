@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class CalorieScreen extends StatefulWidget {
   @override
@@ -12,13 +13,36 @@ class CalorieScreenState extends State<CalorieScreen> {
 
   List<Map<String, dynamic>> foods = [];
 
-  // calculate total calories
+  // calender state
+  DateTime selectedDate = DateTime.now();
+  DateTime focusedDate = DateTime.now();
+
+  // calculate total calories for selected date
   int getTotalCalories() {
     int total = 0;
     for (int i = 0; i < foods.length; i++) {
-      total += foods[i]['calories'] as int;
+      DateTime foodDate = foods[i]['date'];
+      if (foodDate.year == selectedDate.year &&
+          foodDate.month == selectedDate.month &&
+          foodDate.day == selectedDate.day) {
+        total += foods[i]['calories'] as int;
+      }
     }
     return total;
+  }
+
+  // get foods for selected date
+  List<Map<String, dynamic>> getFoodsForSelectedDate() {
+    List<Map<String, dynamic>> todaysFoods = [];
+    for (int i = 0; i < foods.length; i++) {
+      DateTime foodDate = foods[i]['date'];
+      if (foodDate.year == selectedDate.year &&
+          foodDate.month == selectedDate.month &&
+          foodDate.day == selectedDate.day) {
+        todaysFoods.add(foods[i]);
+      }
+    }
+    return todaysFoods;
   }
 
   // add food function
@@ -34,6 +58,7 @@ class CalorieScreenState extends State<CalorieScreen> {
       foods.add({
         'name': foodController.text,
         'calories': int.parse(caloriesController.text),
+        'date': selectedDate,
       });
 
       foodController.clear();
@@ -44,13 +69,15 @@ class CalorieScreenState extends State<CalorieScreen> {
   // remove food function
   void removeFood(int index) {
     setState(() {
-      foods.removeAt(index);
+      Map<String, dynamic> foodToRemove = getFoodsForSelectedDate()[index];
+      foods.remove(foodToRemove);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     int totalCalories = getTotalCalories();
+    List<Map<String, dynamic>> todaysFoods = getFoodsForSelectedDate();
 
     return Scaffold(
       appBar: AppBar(
@@ -61,7 +88,7 @@ class CalorieScreenState extends State<CalorieScreen> {
             child: Center(
               child: Text(
                 '$totalCalories cal',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -69,6 +96,28 @@ class CalorieScreenState extends State<CalorieScreen> {
       ),
       body: Column(
         children: [
+          
+          // calendar widget
+          TableCalendar(
+            firstDay: DateTime.utc(2025, 1, 1),
+            lastDay: DateTime.utc(2030, 1, 1),
+            focusedDay: focusedDate,
+            selectedDayPredicate: (day) {
+              return isSameDay(selectedDate, day);
+            },
+            onDaySelected: (selectedDay, focusedDay) {
+              setState(() {
+                selectedDate = selectedDay;
+                focusedDate = focusedDay;
+              });
+            },
+            calendarFormat: CalendarFormat.week,
+            headerStyle: HeaderStyle(
+              formatButtonVisible: false,
+              titleCentered: true,
+            ),
+          ),
+
           Padding(
             padding: EdgeInsets.all(16),
             child: Row(
@@ -107,7 +156,7 @@ class CalorieScreenState extends State<CalorieScreen> {
 
           // Food list section
           Expanded(
-            child: foods.isEmpty
+            child: todaysFoods.isEmpty
                 ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -122,20 +171,20 @@ class CalorieScreenState extends State<CalorieScreen> {
                   )
                 : ListView.builder(
                     padding: EdgeInsets.all(16),
-                    itemCount: foods.length,
+                    itemCount: todaysFoods.length,
                     itemBuilder: (context, index) {
                       return Card(
                         margin: EdgeInsets.only(bottom: 12),
                         child: ListTile(
                           title: Text(
-                            foods[index]['name'],
+                            todaysFoods[index]['name'],
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                '${foods[index]['calories']} cal',
+                                '${todaysFoods[index]['calories']} cal',
                                 style: TextStyle(
                                   fontSize: 16,
                                 ),

@@ -13,3 +13,10 @@ I learned a quick way to filter throuhg the wiki to find the included icons in F
 I used the response as a reference and modified it for my preset routines page.
 I learned what makes the difference between different levels of routines. 
 
+10/26
+"what is the best way to implement a weekly calender in flutter"
+The chatbot recommended me to use the table_calender package since tt would be easier
+than creating my own calender.
+I learned that the table_calender is a simple and effective way for adding a calender.
+Using the table_calender wiki make it fairly simple to implement.
+
