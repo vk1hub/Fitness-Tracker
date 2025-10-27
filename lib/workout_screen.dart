@@ -33,6 +33,12 @@ class WorkoutScreenState extends State<WorkoutScreen> {
     return todaysWorkouts;
   }
 
+  void deleteWorkout(WorkoutModel workout) {
+    setState(() {
+      widget.workouts.remove(workout);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     List<WorkoutModel> todaysWorkouts = getWorkoutsForSelectedDate();
@@ -111,9 +117,21 @@ class WorkoutScreenState extends State<WorkoutScreen> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Text(
-                                  '${workout.date.month}/${workout.date.day}/${workout.date.year}',
-                                  style: TextStyle(fontSize: 12),
+                                Row(
+                                  children: [
+                                    Text(
+                                      '${workout.date.month}/${workout.date.day}/${workout.date.year}',
+                                      style: TextStyle(fontSize: 12),
+                                    ),
+                                    SizedBox(width: 8),
+                                    GestureDetector(
+                                      onTap: () => deleteWorkout(workout),
+                                      child: Icon(
+                                        Icons.delete,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
