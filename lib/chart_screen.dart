@@ -77,7 +77,7 @@ class ChartScreenState extends State<ChartScreen> with SingleTickerProviderState
         }
         
         // get total time from weight training details
-        if (details.contains('Total Time:')) {
+        else if (details.contains('Total Time:')) {
           String timePart = details.split('Total Time:')[1].trim();
           String timeValue = timePart.split(' ')[0];
           double time = double.tryParse(timeValue) ?? 0;

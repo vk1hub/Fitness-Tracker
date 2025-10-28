@@ -53,7 +53,7 @@ class NotificationHelper {
         }
 
         // get total time from weight training details
-        if (details.contains('Total Time:')) {
+        else if (details.contains('Total Time:')) {
           String timeStr = details.split('Total Time:')[1].trim();
           totalTime += double.tryParse(timeStr.split(' ')[0]) ?? 0;
         }
